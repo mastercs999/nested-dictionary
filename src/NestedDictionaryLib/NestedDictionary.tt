@@ -1,0 +1,333 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NestedDictionaryLib
+{
+    /// <summary>
+    /// Represents a collection of keys and values.
+    /// </summary>
+    /// <typeparam name="TKey1">The type of the key</typeparam>
+    /// <typeparam name="TValue">The type of the value</typeparam>
+    public class NestedDictionary<TKey1, TValue> : Dictionary<TKey1, TValue>
+    {
+	    /// <summary>
+		/// Initializes a new instance of this class that is empty, has the default initial capacity, and uses the default equality comparer for the key type.
+		/// </summary>
+        public NestedDictionary() : base()
+        {
+        }
+
+		/// <summary>
+		/// Initializes a new instance of this class that is empty, has the specified initial capacity, and uses the default equality comparer for the key type.
+		/// </summary>
+		/// <param name="capacity">The initial number of elements that the dictionary can contain.</param>
+        /// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
+        public NestedDictionary(int capacity) : base(capacity)
+        {
+        }
+
+		/// <summary>
+		/// Initializes a new instance of this class that is empty, has the default initial capacity, and uses the specified equality comparer.
+		/// </summary>
+        /// <param name="comparer">The comparer implementation to use when comparing keys, or null to use the default comparer for the type of the key.</param>
+        public NestedDictionary(IEqualityComparer<TKey1> comparer) : base(comparer)
+        {
+        }
+
+		/// <summary>
+        /// Initializes a new instance of this class that contains elements copied from the specified dictionary and uses the default equality comparer for the key type.
+        /// </summary>
+        /// <param name="dictionary">The dictionary whose elements are copied to the new dictionary.</param>
+        /// <exception cref="ArgumentNullException">dictionary is null</exception>
+        /// <exception cref="ArgumentException">dictionary contains one or more duplicate keys</exception>
+        public NestedDictionary(IDictionary<TKey1, TValue> dictionary) : base(dictionary)
+        {
+        }
+
+		/// <summary>
+        /// Initializes a new instance of this class that is empty, has the specified initial capacity, and uses the specified comparer.
+        /// </summary>
+        /// <param name="capacity">The initial number of elements that the dictionary can contain.</param>
+        /// <param name="comparer">The comparer implementation to use when comparing keys, or null to use the default comparer for the type of the key.</param>
+        /// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
+        public NestedDictionary(int capacity, IEqualityComparer<TKey1> comparer) : base(capacity, comparer)
+        {
+        }
+
+		/// <summary>
+        /// Initializes a new instance of this class that contains elements copied from the specified dictionary and uses the specified comparer.
+        /// </summary>
+        /// <param name="dictionary">The dictionary whose elements are copied to the new dictionary.</param>
+        /// <param name="comparer">The comparer implementation to use when comparing keys, or null to use the default comparer for the type of the key</param>
+        /// <exception cref="ArgumentNullException">dictionary is null</exception>
+        /// <exception cref="ArgumentException">dictionary contains one or more duplicate keys</exception>
+        public NestedDictionary(IDictionary<TKey1, TValue> dictionary, IEqualityComparer<TKey1> comparer) : base(dictionary, comparer)
+        {
+        }
+    }
+	<# for(int i = 2; i < 9; i++) { #>
+	    /// <summary>
+		/// Represents a collection of keys and values where a key leads through nested dictionary to a value.
+		/// </summary>
+		<# for (int k = 1; k <= i; ++k) { #>
+			/// <typeparam name="TKey<#= k #>">The type of the <#= k #>. key</typeparam>
+		<# } #>
+		/// <typeparam name="TValue">The type of the value</typeparam>
+		public class NestedDictionary<<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TValue> : NestedDictionary<TKey1, NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue>>
+		{
+			<# for (int k = 2; k <= i; ++k) { #>
+				private int _capacity<#= k #> = 0;
+			<# } #>
+
+			<# for (int k = 2; k <= i; ++k) { #>
+				private IEqualityComparer<TKey<#= k #>> _comparer<#= k #> = null;
+			<# } #>
+
+			/// <summary>
+			/// Initializes a new instance of this class that is empty, has the default initial capacity, and uses the default equality comparer for the key types.
+			/// </summary>
+			public NestedDictionary() : base()
+			{
+
+			}
+
+			/// <summary>
+			/// Initializes a new instance of this class that is empty, all level dictionaries have the specified initial capacity, and uses the default equality comparer for the key types.
+			/// </summary>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="capacity<#= k #>">The initial number of elements that the <#= k #>. level dictionary can contain.</param>
+			<# } #>
+			/// <exception cref="ArgumentOutOfRangeException">a capacity is less than 0.</exception>
+			public NestedDictionary(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "int capacity" + x)) #>) : base(capacity1)
+			{
+			    <# for (int k = 2; k <= i; ++k) { #>
+				    _capacity<#= k #> = capacity<#= k #>;
+				<# } #>
+			}
+
+			/// <summary>
+			/// Initializes a new instance of this class that is empty, has the default initial capacity, and all level dictionaries use the specified equality comparers.
+			/// </summary>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="comparer<#= k #>">The comparer implementation to use when comparing <#= k #>. level keys, or null to use the default comparer for the type of the key.</param>
+			<# } #>
+			public NestedDictionary(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "IEqualityComparer<TKey" + x + "> comparer" + x)) #>) : base(comparer1)
+			{
+			    <# for (int k = 2; k <= i; ++k) { #>
+				    _comparer<#= k #> = comparer<#= k #>;
+				<# } #>
+			}
+
+			/// <summary>
+			/// Initializes a new instance of this class that contains elements copied from the specified dictionary and uses the default equality comparer for the key types.
+			/// </summary>
+			/// <param name="dictionary">The dictionary whose elements are copied to the new dictionary.</param>
+			/// <exception cref="ArgumentNullException">dictionary is null</exception>
+			/// <exception cref="ArgumentException">dictionary contains one or more duplicate keys</exception>
+			public NestedDictionary(IDictionary<TKey1, NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue>> dictionary) : base(dictionary)
+			{
+			}
+
+			/// <summary>
+			/// Initializes a new instance of this class that is empty, all level dictionaries have the specified initial capacity and use the specified comparer.
+			/// </summary>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="capacity<#= k #>">The initial number of elements that the <#= k #>. level dictionary can contain.</param>
+			<# } #>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="comparer<#= k #>">The comparer implementation to use when comparing <#= k #>. level keys, or null to use the default comparer for the type of the key.</param>
+			<# } #>
+			/// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
+			public NestedDictionary(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "int capacity" + x)) #>, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "IEqualityComparer<TKey" + x + "> comparer" + x)) #>) : base(capacity1, comparer1)
+			{
+				<# for (int k = 2; k <= i; ++k) { #>
+				    _capacity<#= k #> = capacity<#= k #>;
+				<# } #>
+
+				<# for (int k = 2; k <= i; ++k) { #>
+				    _comparer<#= k #> = comparer<#= k #>;
+				<# } #>
+			}
+
+			/// <summary>
+			/// Initializes a new instance of this class that contains elements copied from the specified dictionary and uses the specified comparer.
+			/// </summary>
+			/// <param name="dictionary">The dictionary whose elements are copied to the new dictionary.</param>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="comparer<#= k #>">The comparer implementation to use when comparing <#= k #>. level keys, or null to use the default comparer for the type of the key.</param>
+			<# } #>
+			/// <exception cref="ArgumentNullException">dictionary is null</exception>
+			/// <exception cref="ArgumentException">dictionary contains one or more duplicate keys</exception>
+			public NestedDictionary(IDictionary<TKey1, NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue>> dictionary, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "IEqualityComparer<TKey" + x + "> comparer" + x)) #>) : base(dictionary, comparer1)
+			{
+				<# for (int k = 2; k <= i; ++k) { #>
+				    _comparer<#= k #> = comparer<#= k #>;
+				<# } #>
+			}
+
+
+
+
+			/// <summary>
+			/// Gets or sets the value associated with the specified key.
+			/// </summary>
+			/// <param name="key1">The key of the value to get or set</param>
+			/// <returns>The value associated with the specified key. If the specified key is not found and the key leads to a value, a get operation 
+			/// throws a System.Collections.Generic.KeyNotFoundException. If the specified key is not found and the key leads to another nested dictionary (goes deeper),
+			/// the nested dictionary is created. Set operation creates a new element with the specified key.</returns>
+			/// <exception cref="ArgumentNullException">key is null</exception>
+			/// <exception cref="KeyNotFoundException">The property is retrieved and key does not exist in the lowest level of the collection</exception>
+			public new NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> this[TKey1 key1]
+			{
+				get => TryGetValue(key1, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict) ? dict : base[key1] = new NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue>(<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "_capacity" + x)) #>, <#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "_comparer" + x)) #>);
+				set => base[key1] = value;
+			}
+
+			<# for (int k = 2; k <= i; ++k) { #>
+				/// <summary>
+				/// Gets the comparer that is used to determine equality of keys for the <#= k #>. level of the dictionary.
+				/// </summary>
+				public IEqualityComparer<TKey<#= k #>> Comparer<#= k #> => _comparer<#= k #>;
+			<# } #>
+
+
+
+
+			/// <summary>
+			/// Adds the specified keys and value to the dictionaries.
+			/// </summary>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="key<#= k #>">The key of the element to add for <#= k #>. level.</param>
+			<# } #>
+			/// <param name="value">The value of the element to add. The value can be null for reference types.</param>
+			/// <exception cref="ArgumentNullException">A key is null</exception>
+			/// <exception cref="ArgumentException">An element with the same key already exists in the dictionary</exception>
+			public void Add(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x + " key" + x)) #>, TValue value)
+			{
+				this[key1].Add(<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "key" + x)) #>, value);
+			}
+			<# for (int m = i - 1; m >= 2; --m) { #>
+
+			    /// <summary>
+				/// Adds the specified keys and value to the dictionaries.
+				/// </summary>
+				<# for (int k = 1; k <= m; ++k) { #>
+					/// <param name="key<#= k #>">The key of the element to add for <#= k #>. level.</param>
+				<# } #>
+				/// <param name="dict">The dictionary for <#= m + 1 #>. level.</param>
+				/// <exception cref="ArgumentNullException">A key is null</exception>
+				/// <exception cref="ArgumentException">An element with the same key already exists in the dictionary</exception>
+			    public void Add(<#= String.Join(", ", Enumerable.Range(1, m).Select(x => "TKey" + x + " key" + x)) #>, NestedDictionary<<#= String.Join(", ", Enumerable.Range(m + 1, i - m).Select(x => "TKey" + x)) #>, TValue> dict)
+				{
+				    this[key1].Add(<#= String.Join(", ", Enumerable.Range(2, m - 1).Select(x => "key" + x)) #>, dict);
+				}
+			<# } #>
+
+
+
+			<# for (int m = i; m >= 2; --m) { #>
+
+				/// <summary>
+				/// Determines whether the nested dictionary contains specified key chain.
+				/// </summary>
+				<# for (int k = 1; k <= m; ++k) { #>
+					/// <param name="key<#= k #>">The key to locate for <#= k #>. level.</param>
+				<# } #>
+				/// <returns>True if the nested dictionary contains an element with the specified key chain; otherwise, false.</returns>
+				/// <exception cref="ArgumentNullException">key is null</exception>
+			    public bool ContainsKey(<#= String.Join(", ", Enumerable.Range(1, m).Select(x => "TKey" + x + " key" + x)) #>)
+				{
+					return TryGetValue(key1, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict) && dict.ContainsKey(<#= String.Join(", ", Enumerable.Range(2, m - 1).Select(x => "key" + x)) #>);
+				}
+			<# } #>
+
+
+
+
+			/// <summary>
+			/// Determines whether the nested dictionary contains a specific value.
+			/// </summary>
+			/// <param name="value">The value to locate in the nested dictionary. The value can be null for reference types.</param>
+			/// <returns>True if the nested dictionary contains an element with the specified value; otherwise, false.</returns>
+			public bool ContainsValue(TValue value)
+			{
+				foreach (NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict in Values)
+					if (dict.ContainsValue(value))
+						return true;
+
+				return false;
+			}
+
+
+
+			<# for (int m = i; m >= 2; --m) { #>
+
+				/// <summary>
+				///  Removes the value or nested dictionary on a deeper level with the specified key chain from the nested dictionary.
+				/// </summary>
+				<# for (int k = 1; k <= m; ++k) { #>
+					/// <param name="key<#= k #>">The key for <#= k #>. level.</param>
+				<# } #>
+				/// <returns>True if the element is successfully found and removed; otherwise, false. This method returns false if key is not found in the nested dictionary.</returns>
+				/// <exception cref="ArgumentNullException">key is null</exception>
+				public bool Remove(<#= String.Join(", ", Enumerable.Range(1, m).Select(x => "TKey" + x + " key" + x)) #>)
+				{
+					if (TryGetValue(key1, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict))
+						return dict.Remove(<#= String.Join(", ", Enumerable.Range(2, m - 1).Select(x => "key" + x)) #>);
+
+					return false;
+				}
+			<# } #>
+
+
+
+
+			/// <summary>
+			/// Gets the value associated with the specified key chain.
+			/// </summary>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="key<#= k #>">The key of the value to get <#= k #>. level.</param>
+			<# } #>
+			/// <param name="value">When this method returns true, contains the value associated with the specified key chain, if the key chain is found; otherwise,
+			/// the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
+			/// <returns>True if the nested dictionary contains an element with the specified key chain; otherwise, false.</returns>
+			/// <exception cref="ArgumentNullException">key is null</exception>
+			public bool TryGetValue(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x + " key" + x)) #>, out TValue value)
+			{
+				value = default(TValue);
+				return TryGetValue(key1, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict) && dict.TryGetValue(<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "key" + x)) #>, out value);
+			}
+			<# for (int m = i - 1; m >= 2; --m) { #>
+
+				/// <summary>
+				/// Gets the nested dictionary of deeper level associated with the specified key chain.
+				/// </summary>
+				<# for (int k = 1; k <= m; ++k) { #>
+					/// <param name="key<#= k #>">The key of the value to get <#= k #>. level.</param>
+				<# } #>
+				/// <param name="value">When this method returns true, contains the value associated with the specified key chain, if the key chain is found; otherwise,
+				/// the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
+				/// <returns>True if the nested dictionary contains an element with the specified key chain; otherwise, false.</returns>
+				/// <exception cref="ArgumentNullException">key is null</exception>
+				public bool TryGetValue(<#= String.Join(", ", Enumerable.Range(1, m).Select(x => "TKey" + x + " key" + x)) #>, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(m + 1, i - m).Select(x => "TKey" + x)) #>, TValue> value)
+				{
+					value = default(NestedDictionary<<#= String.Join(", ", Enumerable.Range(m + 1, i - m).Select(x => "TKey" + x)) #>, TValue>);
+					return TryGetValue(key1, out NestedDictionary<<#= String.Join(", ", Enumerable.Range(2, i - 1).Select(x => "TKey" + x)) #>, TValue> dict) && dict.TryGetValue(<#= String.Join(", ", Enumerable.Range(2,  m - 1).Select(x => "key" + x)) #>, out value);
+				}
+			<# } #>
+		}  
+	<# } #> 
+}
