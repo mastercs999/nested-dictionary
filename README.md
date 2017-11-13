@@ -1,6 +1,10 @@
 # nested-dictionary
 C# library for easy use of nested dictionaries.
 
+## Install
+* Use a [NuGet](https://www.nuget.org/packages/NestedDictionaryLib) package
+* Or use the code in this repository
+
 ## Example
 ```cs
 // Initialize
@@ -33,5 +37,4 @@ dictionary.Remove("Oslo", 2007, true);
 // Remove intermediate level
 dictionary.Remove("Oslo", 2009);
 ```
-
 Other examples can be found in [Program.cs](src/ExampleCli/Program.cs)
