@@ -1,0 +1,10 @@
+
+src/\.vs/
+
+src/ExampleCli/bin/
+
+src/ExampleCli/obj/
+
+src/NestedDictionaryLib/bin/
+
+src/NestedDictionaryLib/obj/
