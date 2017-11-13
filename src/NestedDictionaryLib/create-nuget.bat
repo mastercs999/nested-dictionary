@@ -1,0 +1,1 @@
+nuget pack NestedDictionaryLib.csproj -Prop Configuration=Release -IncludeReferencedProjects -Exclude **/*.tt
