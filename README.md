@@ -72,6 +72,6 @@ List<Place> places = new List<Place>()
 };
 
 // Create a dictionary for the places
-NestedDictionary<string, string, string, int, Place> dictionary = places.ToNestedDictionary(x => x.Country, x => x.City, x => x.Street, x => x.Number, x => x)
+NestedDictionary<string, string, string, int, Place> dictionary = places.ToNestedDictionary(x => x.Country, x => x.City, x => x.Street, x => x.Number, x => x);
 ```
 Other examples can be found in [Program.cs](src/ExampleCli/Program.cs)
