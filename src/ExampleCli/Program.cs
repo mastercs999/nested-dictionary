@@ -18,6 +18,8 @@ namespace ExampleCli
             ContainsValue(CreateSampleDictionary());
             Remove(CreateSampleDictionary());
             TryGetValue(CreateSampleDictionary());
+
+            ToNestedDictionary(CreateSamplePlaces());
         }
 
         private static NestedDictionary<string, int, bool, decimal> CreateSampleDictionary() => new NestedDictionary<string, int, bool, decimal>()
@@ -29,6 +31,22 @@ namespace ExampleCli
             { "Boston", 2006, false, 5m },
             { "Boston", 2006, true, 6m },
         };
+        private static List<Place> CreateSamplePlaces()
+        {
+            return new List<Place>()
+            {
+                { new Place("USA", "Dallas", "Abrams Road", 234) },
+                { new Place("Germany", "Berlin", "Vogel Strase", 111) },
+                { new Place("USA", "Washington", "Skillman Street", 43) },
+                { new Place("USA", "Washington", "Ranking Avenue", 4553) },
+                { new Place("USA", "Phoenix", "Golf Drive", 134) },
+                { new Place("USA", "Phoenix", "Gold Drive", 135) },
+                { new Place("Canada", "Ottawa", "Daly Avenue", 6743) },
+                { new Place("Canada", "Ottawa", "Steward Street", 85) },
+                { new Place("Canada", "Gatineau", "George Street", 8125) },
+                { new Place("Canada", "Gatineau", "York Street", 903) },
+            };
+        }
         private static void PrintDictionary(NestedDictionary<string, int, bool, decimal> dictionary)
         {
             Console.WriteLine();
@@ -36,6 +54,16 @@ namespace ExampleCli
                 foreach (KeyValuePair<int, NestedDictionary<bool, decimal>> kvp2 in kvp1.Value)
                     foreach (KeyValuePair<bool, decimal> kvp3 in kvp2.Value)
                         Console.WriteLine($"{kvp1.Key}\t-\t{kvp2.Key}\t-\t{kvp3.Key}\t-\t{kvp3.Value}");
+            Console.WriteLine();
+        }
+        private static void PrintCityDictionary(NestedDictionary<string, string, string, int, Place> dictionary)
+        {
+            Console.WriteLine();
+            foreach (KeyValuePair<string, NestedDictionary<string, string, int, Place>> kvp1 in dictionary)
+                foreach (KeyValuePair<string, NestedDictionary<string, int, Place>> kvp2 in kvp1.Value)
+                    foreach (KeyValuePair<string, NestedDictionary<int, Place>> kvp3 in kvp2.Value)
+                        foreach (KeyValuePair<int, Place> kvp4 in kvp3.Value)
+                            Console.WriteLine($"{kvp1.Key} - {kvp2.Key} - {kvp3.Key} - {kvp4.Key} - {kvp4.Value}");
             Console.WriteLine();
         }
 
@@ -159,6 +187,13 @@ namespace ExampleCli
             Console.WriteLine(dictionary.TryGetValue("Boston", 2006, true, out decimal value3));                     // True
 
             PrintDictionary(dictionary);
+        }
+
+        private static void ToNestedDictionary(List<Place> places)
+        {
+            Console.WriteLine("---To Nested Dictionary---");
+
+            PrintCityDictionary(places.ToNestedDictionary(x => x.Country, x => x.City, x => x.Street, x => x.Number, x => x));
         }
     }
 }

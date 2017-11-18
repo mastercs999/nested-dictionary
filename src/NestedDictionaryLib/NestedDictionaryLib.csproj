@@ -41,6 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Extensions.tt</DependentUpon>
+    </Compile>
     <Compile Include="NestedDictionary.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -52,6 +57,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Extensions.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Extensions.cs</LastGenOutput>
+    </Content>
     <Content Include="NestedDictionary.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>NestedDictionary.cs</LastGenOutput>

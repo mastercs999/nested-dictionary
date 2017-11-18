@@ -1,0 +1,87 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NestedDictionaryLib
+{
+    /// <summary>
+    /// Provides a set of static (Shared in Visual Basic) methods for creation of nested dictionaries from objects that implement ienumerable.
+    /// </summary>
+    public static class ExtensionsTest
+    {
+		<# for(int i = 2; i < 9; i++) { #>
+
+			/// <summary>
+			/// Creates a nested dictionary from an ienumerable according to specified key selectors and element selector functions.
+			/// </summary>
+			/// <typeparam name="TSource">The type of the elements of source.</typeparam>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <typeparam name="TKey<#= k #>">The type of the key returned by key<#= k #>Selector for level <#= k #>.</typeparam>
+			<# } #>
+			/// <typeparam name="TElement">The type of the value returned by elementSelector.</typeparam>
+			/// <param name="source">An ienumerable to create a nested dictionary from.</param>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="key<#= k #>Selector">A function to extract a key for level <#= k #> from each element.</param>
+			<# } #>
+			/// <param name="elementSelector">A transform function to produce a result element value from each element.</param>
+			/// <returns>A nested dictionary that contains values of type TElement selected from the input sequence.</returns>
+			/// <exception cref="ArgumentNullException">source or some of keySelectors or elementSelector is null.-or- some of keySelectors produces a key that is null.</exception>
+			/// <exception cref="ArgumentException">Some of keySelectors produces duplicate keys for two elements.</exception>
+			public static NestedDictionary<<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement> ToNestedDictionary<TSource, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement>(this IEnumerable<TSource> source, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "Func<TSource, TKey" + x + "> key" + x + "Selector")) #>, Func<TSource, TElement> elementSelector)
+			{
+				return ToNestedDictionary(source, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "key" + x + "Selector")) #>, elementSelector, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "null")) #>);
+			}
+
+			/// <summary>
+			/// Creates a nested dictionary from an ienumerable according to a specified key selectors function, comparers, and an element selector function.
+			/// </summary>
+			/// <typeparam name="TSource">The type of the elements of source.</typeparam>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <typeparam name="TKey<#= k #>">The type of the key returned by key<#= k #>Selector for level <#= k #>.</typeparam>
+			<# } #>
+			/// <typeparam name="TElement">The type of the value returned by elementSelector.</typeparam>
+			/// <param name="source">An ienumerable to create a nested dictionary from.</param>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="key<#= k #>Selector">A function to extract a key for level <#= k #> from each element.</param>
+			<# } #>
+			/// <param name="elementSelector">A transform function to produce a result element value from each element.</param>
+			<# for (int k = 1; k <= i; ++k) { #>
+				/// <param name="comparer<#= k #>">An comparer to compare keys on level <#= k #>.</param>
+			<# } #>
+			/// <returns>A nested dictionary that contains values of type TElement selected from the input sequence.</returns>
+			/// <exception cref="ArgumentNullException">source or some of keySelectors or elementSelector is null.-or- some of keySelectors produces a key that is null.</exception>
+			/// <exception cref="ArgumentException">Some of keySelectors produces duplicate keys for two elements.</exception>
+			public static NestedDictionary<<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement> ToNestedDictionary<TSource, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement>(this IEnumerable<TSource> source, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "Func<TSource, TKey" + x + "> key" + x + "Selector")) #>, Func<TSource, TElement> elementSelector, <#= String.Join(", ", Enumerable.Range(1, i).Select(x => "IEqualityComparer<TKey" + x + "> comparer" + x)) #>)
+			{
+				if (source == null)
+					throw new ArgumentNullException(nameof(source));
+				<# for (int k = 1; k <= i; ++k) { #>
+					if (key<#= k #>Selector == null)
+						throw new ArgumentNullException(nameof(key<#= k #>Selector));
+				<# } #>
+				if (elementSelector == null)
+					throw new ArgumentNullException(nameof(elementSelector));
+
+				NestedDictionary<<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement> dictionary = new NestedDictionary<<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "TKey" + x)) #>, TElement>(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "comparer" + x)) #>);
+
+				foreach (TSource element in source)
+					dictionary.Add(<#= String.Join(", ", Enumerable.Range(1, i).Select(x => "key" + x + "Selector(element)")) #>, elementSelector(element));
+
+				return dictionary;
+			}
+
+		<# } #>
+    }
+}
